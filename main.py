@@ -43,6 +43,15 @@ def progress_hook(d):
         update_status(message)
     elif d['status'] == 'finished':
         update_status(f"Finished downloading: {d['filename']}")
+        # Call the conversion function here if needed
+
+def conversion_progress_hook(d):
+    """Handle conversion progress updates."""
+    if d['status'] == 'finished':
+        update_status(f"Finished converting: {d['filename']}")
+        # Optionally update progress bar to 100% if conversion progress is not available
+        progress_var.set(100)
+        root.update_idletasks()
 
 def download_video():
     url = url_entry.get()
@@ -61,7 +70,7 @@ def download_video():
                 'outtmpl': f'{path}/%(title)s.%(ext)s',
                 'format': 'best',
                 'progress_hooks': [progress_hook],
-                'ffmpeg_location': 'C:/path/to/ffmpeg/bin',  # Replace with the path to your ffmpeg directory
+                'progress_hooks': [progress_hook, conversion_progress_hook]
             }
 
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
@@ -98,17 +107,17 @@ def download_mp3():
                     'preferredcodec': 'mp3',
                     'preferredquality': '192',
                 }],
-                'progress_hooks': [progress_hook]
+                'progress_hooks': [progress_hook, conversion_progress_hook]
             }
 
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                 ydl.download([url])
             
-            messagebox.showinfo("Success", "Audio downloaded successfully!")
-            update_status("Download complete!")
+            messagebox.showinfo("Success", "Audio downloaded and converted successfully!")
+            update_status("Download and conversion complete!")
         except Exception as e:
-            messagebox.showerror("Error", f"Error downloading audio: {e}")
-            update_status("Download failed.")
+            messagebox.showerror("Error", f"Error downloading or converting audio: {e}")
+            update_status("Download or conversion failed.")
             progress_var.set(0)  # Reset progress bar in case of error
 
     # Run the download task in a separate thread
@@ -124,27 +133,26 @@ def set_download_path():
 # Load saved configuration
 config = load_config()
 initial_path = config.get('download_path', '')
-
 # Create the GUI
 root = tk.Tk()
-root.title("YouTube Downloader")
+root.title("Andolon - Youtube Downloader")
 
 # Set window background color and size
 root.configure(bg="#2C3E50")
-root.geometry("450x450")
+root.geometry("450x400")
 
 # Add custom styles for labels and buttons
 tk.Label(root, text="YouTube URL:", bg="#2C3E50", fg="white", font=("Helvetica", 12, "bold")).pack(pady=10)
 
 # Entry field with padding and background color
-url_entry = tk.Entry(root, width=40, font=("Helvetica", 12), bg="#ECF0F1", fg="#2C3E50", bd=0)
+url_entry = tk.Entry(root, width=40, font=("Helvetica", 10), bg="#ECF0F1", fg="#2C3E50", bd=0)
 url_entry.pack(pady=5, ipady=5)
 
 # Download path variable
 download_path = tk.StringVar(value=initial_path)
 
 # Entry field for download path with a button to change it
-path_entry = tk.Entry(root, textvariable=download_path, width=40, font=("Helvetica", 12), bg="#ECF0F1", fg="#2C3E50", bd=0, state=tk.DISABLED)
+path_entry = tk.Entry(root, textvariable=download_path, width=40, font=("Helvetica", 10), bg="#ECF0F1", fg="#2C3E50", bd=0, state=tk.DISABLED)
 path_entry.pack(pady=5, ipady=5)
 
 # Button to change download path
@@ -159,17 +167,21 @@ download_button.pack(pady=5)
 download_mp3_button = tk.Button(root, text="Download MP3", bg="#E67E22", fg="white", font=("Helvetica", 12, "bold"), relief="flat", padx=20, pady=5, command=download_mp3)
 download_mp3_button.pack(pady=5)
 
+# Frame for progress bar and status label
+progress_frame = tk.Frame(root, bg="#2C3E50")
+progress_frame.pack(pady=10, padx=20, fill='x')
+
 # Progress bar
 progress_var = tk.DoubleVar()
-progress_bar = ttk.Progressbar(root, variable=progress_var, maximum=100, length=300)  # Adjust length as needed
-progress_bar.pack(pady=10, fill='x')
+progress_bar = ttk.Progressbar(progress_frame, variable=progress_var, maximum=100, length=300)  # Adjust length as needed
+progress_bar.pack(pady=5, fill='x')
 
 # Status label
-status_label = tk.Label(root, text="", bg="#2C3E50", fg="white", font=("Helvetica", 10))
+status_label = tk.Label(progress_frame, text="", bg="#2C3E50", fg="white", font=("Helvetica", 10))
 status_label.pack(pady=5)
 
 # Powered by label
-powered_by_label = tk.Label(root, text="Powered by Andolon", bg="#2C3E50", fg="white", font=("Helvetica", 10, "italic"))
+powered_by_label = tk.Label(root, text="Powered by Andolon - GitHub Andolon-M", bg="#2C3E50", fg="white", font=("Helvetica", 10, "italic"))
 powered_by_label.pack(side=tk.BOTTOM, pady=10)
 
 root.mainloop()
