@@ -68,7 +68,7 @@ def download_video():
         try:
             ydl_opts = {
                 'outtmpl': f'{path}/%(title)s.%(ext)s',
-                'format': 'best',
+                'format': 'bestvideo+bestaudio/best',  
                 'progress_hooks': [progress_hook],
                 'progress_hooks': [progress_hook, conversion_progress_hook]
             }
@@ -139,7 +139,7 @@ root.title("Andolon - Youtube Downloader")
 
 # Set window background color and size
 root.configure(bg="#2C3E50")
-root.geometry("450x400")
+root.geometry("450x410")
 
 # Add custom styles for labels and buttons
 tk.Label(root, text="YouTube URL:", bg="#2C3E50", fg="white", font=("Helvetica", 12, "bold")).pack(pady=10)
@@ -156,15 +156,15 @@ path_entry = tk.Entry(root, textvariable=download_path, width=40, font=("Helveti
 path_entry.pack(pady=5, ipady=5)
 
 # Button to change download path
-change_path_button = tk.Button(root, text="Change Download Path", bg="#3498DB", fg="white", font=("Helvetica", 12, "bold"), relief="flat", padx=10, pady=5, command=set_download_path)
+change_path_button = tk.Button(root, text="Change Download Path", bg="#3498DB", fg="white", font=("Helvetica", 10, "bold"), relief="flat", padx=10, pady=5, command=set_download_path)
 change_path_button.pack(pady=10)
 
 # Styled download button for video
-download_button = tk.Button(root, text="Download Video", bg="#E74C3C", fg="white", font=("Helvetica", 12, "bold"), relief="flat", padx=20, pady=5, command=download_video)
+download_button = tk.Button(root, text="Download Video", bg="#E74C3C", fg="white", font=("Helvetica", 10, "bold"), relief="flat", padx=20, pady=5, command=download_video)
 download_button.pack(pady=5)
 
 # Styled download button for MP3
-download_mp3_button = tk.Button(root, text="Download MP3", bg="#E67E22", fg="white", font=("Helvetica", 12, "bold"), relief="flat", padx=20, pady=5, command=download_mp3)
+download_mp3_button = tk.Button(root, text="Download MP3", bg="#E67E22", fg="white", font=("Helvetica", 10, "bold"), relief="flat", padx=20, pady=5, command=download_mp3)
 download_mp3_button.pack(pady=5)
 
 # Frame for progress bar and status label
@@ -177,7 +177,7 @@ progress_bar = ttk.Progressbar(progress_frame, variable=progress_var, maximum=10
 progress_bar.pack(pady=5, fill='x')
 
 # Status label
-status_label = tk.Label(progress_frame, text="", bg="#2C3E50", fg="white", font=("Helvetica", 10))
+status_label = tk.Label(progress_frame, text="", bg="#2C3E50", fg="white", font=("Helvetica", 8))
 status_label.pack(pady=5)
 
 # Powered by label
