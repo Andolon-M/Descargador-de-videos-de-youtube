@@ -25,12 +25,19 @@ def download_video():
 root = tk.Tk()
 root.title("YouTube Video Downloader")
 
-tk.Label(root, text="YouTube URL:").pack(pady=5)
-url_entry = tk.Entry(root, width=50)
-url_entry.pack(pady=5)
+# Set window background color and size
+root.configure(bg="#2C3E50")
+root.geometry("400x200")
 
-download_button = tk.Button(root, text="Download Video", command=download_video)
-download_button.pack(pady=10)
+# Add custom styles for labels and buttons
+tk.Label(root, text="YouTube URL:", bg="#2C3E50", fg="white", font=("Helvetica", 12, "bold")).pack(pady=10)
 
-root.geometry("400x150")
+# Entry field with padding and background color
+url_entry = tk.Entry(root, width=40, font=("Helvetica", 12), bg="#ECF0F1", fg="#2C3E50", bd=0)
+url_entry.pack(pady=5, ipady=5)
+
+# Styled download button
+download_button = tk.Button(root, text="Download Video", bg="#E74C3C", fg="white", font=("Helvetica", 12, "bold"), relief="flat", padx=20, pady=5, command=download_video)
+download_button.pack(pady=20)
+
 root.mainloop()
