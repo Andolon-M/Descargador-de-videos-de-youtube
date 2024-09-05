@@ -108,7 +108,7 @@ Para que la conversión a MP3 funcione correctamente, debes asegurarte de que lo
    
 2. **Ejecutar la Aplicación**
    - **Windows**: Haz doble clic en el archivo ejecutable `.exe`.
-   - **Mac/Linux**: Abre una terminal y ejecuta el archivo usando `python nombre_del_archivo.py`.
+   - **Mac/Linux**: Abre una terminal y ejecuta el archivo usando `main.py`.
 
 3. **Interfaz de Usuario**
    - **URL de YouTube**:
