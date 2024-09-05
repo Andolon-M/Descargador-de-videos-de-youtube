@@ -12,31 +12,57 @@ CONFIG_FILE = "config.pkl"
 cancel_download = threading.Event()
 
 def load_config():
-    """Load the saved configuration."""
+    """
+    Load the saved configuration from a pickle file.
+    
+    Returns:
+        dict: Configuration dictionary with saved settings.
+    """
     if os.path.exists(CONFIG_FILE):
         with open(CONFIG_FILE, 'rb') as f:
             return pickle.load(f)
     return {}
 
 def save_config(config):
-    """Save the configuration."""
+    """
+    Save the configuration to a pickle file.
+    
+    Args:
+        config (dict): Configuration dictionary to be saved.
+    """
     with open(CONFIG_FILE, 'wb') as f:
         pickle.dump(config, f)
 
 def update_progress_bar(downloaded_bytes, total_bytes):
-    """Update the progress bar and status label."""
+    """
+    Update the progress bar and status label based on the downloaded bytes.
+    
+    Args:
+        downloaded_bytes (int): The number of bytes downloaded.
+        total_bytes (int): The total number of bytes to be downloaded.
+    """
     if total_bytes > 0:
         progress = (downloaded_bytes / total_bytes) * 100
         progress_var.set(progress)
         root.update_idletasks()
 
 def update_status(message):
-    """Update the status label."""
+    """
+    Update the status label with a message.
+    
+    Args:
+        message (str): The message to display on the status label.
+    """
     status_label.config(text=message)
     root.update_idletasks()
 
 def progress_hook(d):
-    """Handle progress and status updates."""
+    """
+    Hook function to handle progress updates and check for cancellation.
+    
+    Args:
+        d (dict): Dictionary containing progress information.
+    """
     if cancel_download.is_set():
         raise Exception("Download cancelled")
 
@@ -52,6 +78,9 @@ def progress_hook(d):
         root.update_idletasks()
 
 def download_video():
+    """
+    Download the video from the provided URL and save it to the selected path.
+    """
     url = url_entry.get()
     path = download_path.get()  # Use the saved path
     
@@ -64,6 +93,9 @@ def download_video():
     cancel_download.clear()  # Clear the cancel event
 
     def download_task():
+        """
+        Task to perform the video download using yt_dlp in a separate thread.
+        """
         try:
             ydl_opts = {
                 'outtmpl': f'{path}/%(title)s.%(ext)s',
@@ -89,6 +121,9 @@ def download_video():
     threading.Thread(target=download_task).start()
 
 def download_mp3():
+    """
+    Download the audio from the provided URL and convert it to MP3 format.
+    """
     url = url_entry.get()
     path = download_path.get()  # Use the saved path
     
@@ -101,8 +136,17 @@ def download_mp3():
     cancel_download.clear()  # Clear the cancel event
 
     def download_task():
+        """
+        Task to perform the audio download and conversion to MP3 using yt_dlp in a separate thread.
+        """
         try:
             def hook(d):
+                """
+                Hook function to handle progress updates and check for cancellation.
+                
+                Args:
+                    d (dict): Dictionary containing progress information.
+                """
                 if cancel_download.is_set():
                     raise Exception("Download cancelled")
                 if d['status'] == 'downloading':
@@ -145,14 +189,18 @@ def download_mp3():
     threading.Thread(target=download_task).start()
 
 def set_download_path():
-    """Open a dialog to select a download path and save it."""
+    """
+    Open a dialog to select a download path and save it.
+    """
     path = filedialog.askdirectory()
     if path:
         download_path.set(path)
         save_config({'download_path': path})
 
 def cancel_operation():
-    """Cancel the ongoing download or conversion."""
+    """
+    Cancel the ongoing download or conversion.
+    """
     cancel_download.set()
     update_status("Cancelling...")
     progress_var.set(0)
