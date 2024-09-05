@@ -4,10 +4,12 @@ import yt_dlp
 import os
 import pickle
 import threading
-import time
 
 # File to store the download path
 CONFIG_FILE = "config.pkl"
+
+# Global variable to control cancellation
+cancel_download = threading.Event()
 
 def load_config():
     """Load the saved configuration."""
@@ -35,6 +37,9 @@ def update_status(message):
 
 def progress_hook(d):
     """Handle progress and status updates."""
+    if cancel_download.is_set():
+        raise Exception("Download cancelled")
+
     if d['status'] == 'downloading':
         total_bytes = d.get('total_bytes', 0)
         downloaded_bytes = d.get('downloaded_bytes', 0)
@@ -43,13 +48,6 @@ def progress_hook(d):
         update_status(message)
     elif d['status'] == 'finished':
         update_status(f"Finished downloading: {d['filename']}")
-        # Call the conversion function here if needed
-
-def conversion_progress_hook(d):
-    """Handle conversion progress updates."""
-    if d['status'] == 'finished':
-        update_status(f"Finished converting: {d['filename']}")
-        # Optionally update progress bar to 100% if conversion progress is not available
         progress_var.set(100)
         root.update_idletasks()
 
@@ -63,24 +61,28 @@ def download_video():
 
     progress_var.set(0)  # Reset progress bar
     update_status("Starting download...")
+    cancel_download.clear()  # Clear the cancel event
 
     def download_task():
         try:
             ydl_opts = {
                 'outtmpl': f'{path}/%(title)s.%(ext)s',
                 'format': 'bestvideo+bestaudio/best',  
-                'progress_hooks': [progress_hook],
-                'progress_hooks': [progress_hook, conversion_progress_hook]
+                'progress_hooks': [progress_hook]
             }
 
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                 ydl.download([url])
             
-            messagebox.showinfo("Success", "Video downloaded successfully!")
-            update_status("Download complete!")
+            if not cancel_download.is_set():
+                messagebox.showinfo("Success", "Video downloaded successfully!")
+                update_status("Download complete!")
         except Exception as e:
-            messagebox.showerror("Error", f"Error downloading video: {e}")
-            update_status("Download failed.")
+            if cancel_download.is_set():
+                update_status("Download cancelled.")
+            else:
+                messagebox.showerror("Error", f"Error downloading video: {e}")
+                update_status("Download failed.")
             progress_var.set(0)  # Reset progress bar in case of error
 
     # Run the download task in a separate thread
@@ -96,9 +98,24 @@ def download_mp3():
 
     progress_var.set(0)  # Reset progress bar
     update_status("Starting download...")
+    cancel_download.clear()  # Clear the cancel event
 
     def download_task():
         try:
+            def hook(d):
+                if cancel_download.is_set():
+                    raise Exception("Download cancelled")
+                if d['status'] == 'downloading':
+                    total_bytes = d.get('total_bytes', 0)
+                    downloaded_bytes = d.get('downloaded_bytes', 0)
+                    update_progress_bar(downloaded_bytes, total_bytes)
+                    message = d.get('info_dict', {}).get('title', 'Downloading...')
+                    update_status(message)
+                elif d['status'] == 'finished':
+                    update_status(f"Finished downloading: {d['filename']}")
+                    progress_var.set(100)
+                    root.update_idletasks()
+
             ydl_opts = {
                 'outtmpl': f'{path}/%(title)s.%(ext)s',
                 'format': 'bestaudio/best',
@@ -107,17 +124,21 @@ def download_mp3():
                     'preferredcodec': 'mp3',
                     'preferredquality': '192',
                 }],
-                'progress_hooks': [progress_hook, conversion_progress_hook]
+                'progress_hooks': [hook]
             }
 
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                 ydl.download([url])
             
-            messagebox.showinfo("Success", "Audio downloaded and converted successfully!")
-            update_status("Download and conversion complete!")
+            if not cancel_download.is_set():
+                messagebox.showinfo("Success", "Audio downloaded and converted successfully!")
+                update_status("Download and conversion complete!")
         except Exception as e:
-            messagebox.showerror("Error", f"Error downloading or converting audio: {e}")
-            update_status("Download or conversion failed.")
+            if cancel_download.is_set():
+                update_status("Download cancelled.")
+            else:
+                messagebox.showerror("Error", f"Error downloading or converting audio: {e}")
+                update_status("Download or conversion failed.")
             progress_var.set(0)  # Reset progress bar in case of error
 
     # Run the download task in a separate thread
@@ -130,16 +151,23 @@ def set_download_path():
         download_path.set(path)
         save_config({'download_path': path})
 
+def cancel_operation():
+    """Cancel the ongoing download or conversion."""
+    cancel_download.set()
+    update_status("Cancelling...")
+    progress_var.set(0)
+
 # Load saved configuration
 config = load_config()
 initial_path = config.get('download_path', '')
+
 # Create the GUI
 root = tk.Tk()
 root.title("Andolon - Youtube Downloader")
 
 # Set window background color and size
 root.configure(bg="#2C3E50")
-root.geometry("450x410")
+root.geometry("450x460")
 
 # Add custom styles for labels and buttons
 tk.Label(root, text="YouTube URL:", bg="#2C3E50", fg="white", font=("Helvetica", 12, "bold")).pack(pady=10)
@@ -167,6 +195,10 @@ download_button.pack(pady=5)
 download_mp3_button = tk.Button(root, text="Download MP3", bg="#E67E22", fg="white", font=("Helvetica", 10, "bold"), relief="flat", padx=20, pady=5, command=download_mp3)
 download_mp3_button.pack(pady=5)
 
+# Cancel button
+cancel_button = tk.Button(root, text="Cancel Operation", bg="#34495E", fg="white", font=("Helvetica", 10, "bold"), relief="flat", padx=20, pady=5, command=cancel_operation)
+cancel_button.pack(pady=10)
+
 # Frame for progress bar and status label
 progress_frame = tk.Frame(root, bg="#2C3E50")
 progress_frame.pack(pady=10, padx=20, fill='x')
@@ -181,7 +213,8 @@ status_label = tk.Label(progress_frame, text="", bg="#2C3E50", fg="white", font=
 status_label.pack(pady=5)
 
 # Powered by label
-powered_by_label = tk.Label(root, text="Powered by Andolon - GitHub Andolon-M", bg="#2C3E50", fg="white", font=("Helvetica", 10, "italic"))
-powered_by_label.pack(side=tk.BOTTOM, pady=10)
+powered_by_label = tk.Label(root, text="Powered by Andolon - GitHub Andolon-M", bg="#2C3E50", fg="white", font=("Helvetica", 8))
+powered_by_label.pack(side=tk.BOTTOM, pady=5)
 
+# Start the GUI event loop
 root.mainloop()
