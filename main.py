@@ -208,8 +208,8 @@ progress_var = tk.DoubleVar()
 progress_bar = ttk.Progressbar(progress_frame, variable=progress_var, maximum=100, length=300)  # Adjust length as needed
 progress_bar.pack(pady=5, fill='x')
 
-# Status label
-status_label = tk.Label(progress_frame, text="", bg="#2C3E50", fg="white", font=("Helvetica", 8))
+# Status label with word wrapping
+status_label = tk.Label(progress_frame, text="", bg="#2C3E50", fg="white", font=("Helvetica", 8), wraplength=300)
 status_label.pack(pady=5)
 
 # Powered by label
