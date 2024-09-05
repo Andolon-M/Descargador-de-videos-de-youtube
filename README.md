@@ -65,7 +65,7 @@ Para que la aplicación funcione correctamente, necesitas instalar las siguiente
 
 1. **Clonar el Repositorio**
    ```bash
-   git clone https://github.com/Andolon-M/Descargador-de-videos-de-youtube.git
+   git clone https://github.com/Andolon-M/Video-Dowloader.git
    cd tu_repositorio
    ```
 
