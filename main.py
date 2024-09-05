@@ -256,5 +256,10 @@ progress_bar.pack(fill=tk.X, padx=10, pady=20)
 status_label = tk.Label(root, text="Listo", bg="#2C3E50", fg="white", font=("Helvetica", 10))
 status_label.pack()
 
+# Powered by label
+powered_by_label = tk.Label(root, text="Powered by Andolon - GitHub Andolon-M", bg="#2C3E50", fg="white", font=("Helvetica", 8))
+powered_by_label.pack(side=tk.BOTTOM, pady=5)
+
+
 # Iniciar el bucle principal
 root.mainloop()
