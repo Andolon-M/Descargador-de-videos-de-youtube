@@ -1,2 +1,11 @@
 para 64 bits
 Para 64 bits.zip
+build/
+*.spec
+__pycache__/
+Scripts
+Lib
+Include
+listaVideos.json
+config.pkl
+.venv
