@@ -1,0 +1,40 @@
+Requisitos
+Para la conversión a MP3, necesitas los siguientes archivos ejecutables en el mismo directorio donde se ejecuta el programa:
+
+* ffmpeg
+* ffplay
+* ffprobe
+
+Windows 
+El ejecutable ya incluye todo lo necesario para ejecutar el programa.
+
+Instrucciones de Uso
+1. Descarga el Ejecutable
+Descarga el archivo ejecutable de Andolon desde este enlace [https://drive.google.com/drive/folders/1gZTyNDwWECaHknb02uhPrmGBbhwyPSDa?usp=sharing]
+
+2. Ejecuta el Programa
+Haz doble clic en el archivo Andolon.exe para iniciar el programa.
+
+3. Proporciona la URL de YouTube
+En el campo de texto que aparece en la parte superior, introduce la URL del video de YouTube que deseas descargar.
+
+4. Elige la Carpeta de Descarga
+Debajo del campo de URL, verás la ruta de descarga actual. Si deseas cambiar la carpeta donde se guardará el archivo, haz clic en el botón Cambiar ruta de descarga y selecciona una nueva carpeta.
+
+5. Descarga el Video o el Audio
+Para descargar el video completo:
+Haz clic en Descargar Video.
+Para descargar solo el audio en formato MP3:
+Haz clic en Descargar MP3.
+
+6. Progreso de la Descarga
+Una barra de progreso te indicará el avance de la descarga.
+Un mensaje de estado te informará cuando la descarga haya finalizado o si hubo algún error.
+
+7. Cancela la Descarga (Opcional)
+Si deseas cancelar la descarga en curso, haz clic en el botón Cancelar Operación.
+
+
+Notas
+Asegúrate de tener una conexión a internet estable mientras usas el programa.
+Los archivos descargados se guardarán en la carpeta que hayas seleccionado o en la ruta predeterminada.
